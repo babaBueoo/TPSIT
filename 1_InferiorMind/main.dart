@@ -38,12 +38,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String message = 'Indovina la sequenza segreta';
-  String vittorie = "Vittorie: ";
-  String sconitte = "Sconfitte: ";
   int vittorieMatch = 0;
   int sconfitteMatch = 0;
 
-  List<Color> colori = [
+    List<Color> colori = [
     Colors.grey,
     Colors.blue,
     Colors.red,
@@ -61,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void frasiMotivazionali(bool vittoria) {
-    List<String> frasiVittoria = [
+   const  List<String> frasiVittoria = [
       " Bravo! Continua così!",
       " Fantastico!!",
       " Incredibile! Hai indovinato alla perfezione!",
@@ -73,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
       " La tua mente è un computer di colori!",
       " Grande! Ogni vittoria ti rende più forte!",
     ];
-    List<String> frasiSconfitta = [
+    const List<String> frasiSconfitta = [
       "Non è questa volta... ma ci sei quasi!",
       "Ogni errore è un passo verso la vittoria!",
       "Non mollare, la prossima volta sarà tua!",
@@ -101,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
       int nCasuale = Random().nextInt(4) + 1;
       sequenzaSegreta[i] = nCasuale;
     }
-    print(sequenzaSegreta);
   }
 
   void _checkSequence() {
