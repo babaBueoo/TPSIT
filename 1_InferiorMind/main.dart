@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<int> statiBottoni = [0, 0, 0, 0];
   List<int> sequenzaSegreta = [1, 2, 3, 4];
   Color messageColor = Colors.blueGrey.shade600;
+
   @override
   void initState() {
     super.initState();
@@ -148,114 +149,113 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Container(
         color: Colors.brown.shade50,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    message,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: messageColor,
-                    ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: messageColor,
                   ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Vittorie: $vittorieMatch',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(width: 20),
-
-                      Text(
-                        'Sconfitte: $sconfitteMatch',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colori[statiBottoni[0]],
-                          fixedSize: const Size(30, 80),
-                          elevation: 5,
-                        ),
-                        onPressed: () => _cambiaColore(0),
-                        child: Text(''),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colori[statiBottoni[1]],
-                          fixedSize: Size(30, 80),
-                          elevation: 5,
-                        ),
-                        onPressed: () => _cambiaColore(1),
-                        child: Text(''),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colori[statiBottoni[2]],
-                          fixedSize: Size(30, 80),
-                          elevation: 5,
-                        ),
-                        onPressed: () => _cambiaColore(2),
-                        child: Text(''),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colori[statiBottoni[3]],
-                          fixedSize: Size(30, 80),
-                          elevation: 5,
-                        ),
-                        onPressed: () => _cambiaColore(3),
-                        child: Text(''),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 60),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown.shade50,
-                      foregroundColor: Colors.blueGrey.shade600,
-                      fixedSize: Size(200, 50),
-                      elevation: 5,
-                      side: BorderSide(
-                        // Bordo
-                        color: Colors.brown.shade100,
-                        width: 2,
-                      ),
-                    ),
-
-                    onPressed: _checkSequence,
-                    child: Text(
-                      "Controlla Sequenza",
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Vittorie: $vittorieMatch',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
+                        color: Colors.green,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    SizedBox(width: 20),
+                    Text(
+                      'Sconfitte: $sconfitteMatch',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colori[statiBottoni[0]],
+                        fixedSize: const Size(30, 80),
+                        elevation: 5,
+                      ),
+                      onPressed: () => _cambiaColore(0),
+                      child: Text(''),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colori[statiBottoni[1]],
+                        fixedSize: Size(30, 80),
+                        elevation: 5,
+                      ),
+                      onPressed: () => _cambiaColore(1),
+                      child: Text(''),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colori[statiBottoni[2]],
+                        fixedSize: Size(30, 80),
+                        elevation: 5,
+                      ),
+                      onPressed: () => _cambiaColore(2),
+                      child: Text(''),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colori[statiBottoni[3]],
+                        fixedSize: Size(30, 80),
+                        elevation: 5,
+                      ),
+                      onPressed: () => _cambiaColore(3),
+                      child: Text(''),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown.shade50,
+                    foregroundColor: Colors.blueGrey.shade600,
+                    fixedSize: Size(200, 50),
+                    elevation: 5,
+                    side: BorderSide(
+                      color: Colors.brown.shade100,
+                      width: 2,
+                    ),
                   ),
-                ],
+                  onPressed: _checkSequence,
+                  child: Text(
+                    "Controlla Sequenza",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
