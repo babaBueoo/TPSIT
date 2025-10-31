@@ -32,22 +32,29 @@ class _MyHomePageState extends State<MyHomePage> {
   bool schiacciato = false;
 
   void cambiaTesto1() {
-    const List<String> bottone1 = ["Start", "Stop", "Restart"];
+    const List<String> bottone1 = ["Start", "Stop", "Reset"];
     setState(() {
       message1 = bottone1[(bottone1.indexOf(message1) + 1) % bottone1.length];
 
-      if (message1 == "Stop" || message1 == "Restart") {
+      if (message1 == "Stop") {
         schiacciato = true;
+        startCounter();
+      }else if(message1 == "Reset"){
+        stopCounter();
       } else if (message1 == "Start") {
         schiacciato = false;
       }
     });
   }
-
   void cambiaTesto2() {
     const List<String> bottone2 = ["Pause", "Resume"];
     setState(() {
       message2 = bottone2[(bottone2.indexOf(message2) + 1) % bottone2.length];
+      if(message2 == "Pause") {
+        resumeCounter();
+      }else{
+        pausaCounter();
+      }
     });
   }
 
@@ -64,41 +71,47 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   int counter = 0;
-  Stream<int>? counterStream;
+  Stream<int>? secondStream;
   StreamSubscription<int>? subscription;
 
-  Stream<int> timedCounter(Duration interval) async* {
-    int i = 0;
-    while (true) {
-      await Future.delayed(interval);
-      yield i++;
+  Stream<int> tickerStream(Duration intervallo) async* {
+    int tick = 0;
+    while(true){
+      await Future.delayed(intervallo);
+      yield tick++;
     }
   }
-
-  void startCounter() {
+  Stream<int> secondiStream() async* {
+    await for ( final tick in tickerStream(const Duration(milliseconds: 100))){
+      if(tick % 10 == 0){
+        yield tick ~/ 10;
+      }
+    }
+  }
+  
+  void stopCounter(){
     subscription?.cancel();
-    counterStream = timedCounter(const Duration(seconds: 1));
-    subscription = counterStream!.listen((value) {
-      setState(() {
-        counter = value;
-      });
-    });
-  }
-
-  void pauseCounter() {
-    subscription?.pause();
-  }
-
-  void resumeCounter() {
-    subscription?.resume();
-  }
-
-  void stopCounter() {
-    subscription?.cancel();
-    setState(() {
+    setState((){
       counter = 0;
     });
   }
+  void startCounter() {
+    stopCounter(); 
+    secondStream = secondiStream();
+    subscription = secondStream!.listen((sec) {
+      setState(() {
+        counter = sec;
+      });
+    });
+  }
+  void pausaCounter(){
+       subscription?.pause();
+  }
+  void resumeCounter(){
+    subscription?.resume();
+  }
+int minuti(int secondi) => secondi ~/ 60;
+int secondi(int secondi) => secondi % 60;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Center(
             child: Text(
-              '$counter',
+               "${minuti(counter).toString().padLeft(2, '0')}:${secondi(counter).toString().padLeft(2, '0')}",
               style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
             ),
           ),
