@@ -1,71 +1,171 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: const MyHomePage());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage());
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  String _connectionStatus = "Disconnected";
-
-  @override
-  void initState() {
-    super.initState();
-    // 
-    _connectToServer();
-  }
-
-  
-  void _connectToServer() {
-    // Logica di connessione non completa
-    String indexRequest = 'GET / HTTP/1.1\nConnection: close\n\n';
-    // Socket.connect("localhost", 3000).then((socket) {
-    //   
-    // }).catchError((e) {
-    // 
-    // });
-  }
+// ----------------------------------------------------
+// LOGIN PAGE
+// ----------------------------------------------------
+class LoginPage extends StatelessWidget {
+  final TextEditingController usernameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Flutter Socket Connection")),
+      appBar: AppBar(title: Text("Chat Login")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Socket Connection Status:',
-              style: Theme.of(context),
+            Text("Inserisci il tuo username"),
+            SizedBox(height: 16),
+
+            SizedBox(
+              width: 250,
+              child: TextField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Username",
+                ),
+              ),
             ),
-            Text(
-              _connectionStatus,
-              style: Theme.of(context).textTheme(
-                    color: _connectionStatus == "Connected"
-                        ? Colors.green
-                        : (_connectionStatus == "Connection Failed"
-                            ? Colors.red
-                            : Colors.grey),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () {
+                String user = usernameController.text.trim();
+                if (user.isEmpty) return;
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(username: user),
                   ),
+                );
+              },
+              child: Text("Entra nella Chat"),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ----------------------------------------------------
+// CHAT PAGE CON TCP
+// ----------------------------------------------------
+class ChatPage extends StatefulWidget {
+   String username;
+
+  ChatPage({required this.username});
+
+  @override
+  ChatPageState createState() => ChatPageState();
+}
+
+class ChatPageState extends State<ChatPage> {
+   TextEditingController msgController = TextEditingController();
+  List<String> messaggi = []; // lista dei messsaggi
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void inviaMessaggio() {
+    String testo = msgController.text.trim();
+    if (testo.isEmpty) return;
+
+    setState(() {
+      messaggi.add("${widget.username}: $testo");
+    });
+
+    msgController.clear();
+  }
+
+  // ----------------------------------------------------
+  // UI DELLA CHAT
+  // ----------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Chat - ${widget.username}")),
+
+      body: Column(
+        children: [
+          Expanded(
+            /*  
+ ListView(
+  children: [
+    Text(messaggi[0]),
+    Text(messaggi[1]),
+    Text(messaggi[2]),
+  ],
+) */
+            child: ListView.builder(
+              padding: EdgeInsets.all(8),
+              itemCount: messaggi.length, // per listview .builder per dire quantit elementi deve costruire
+              itemBuilder: (context, index) {
+                return Chat(
+                  text: messaggi[index],
+                  isMe: messaggi[index].startsWith("${widget.username}:"),
+                );
+              },
+            ),
+          ),
+
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: msgController,
+                  decoration: InputDecoration(
+                    hintText: "Scrivi un messaggio...",
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+
+              IconButton(icon: Icon(Icons.send), onPressed: inviaMessaggio),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ----------------------------------------------------
+// BOLLA MESSAGGIO
+// ----------------------------------------------------
+class Chat extends StatelessWidget {
+  String text;
+  bool isMe;
+
+  Chat({required this.text, required this.isMe});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.blue[200] : Colors.grey[300],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(text),
       ),
     );
   }
