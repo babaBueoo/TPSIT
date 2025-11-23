@@ -1,23 +1,46 @@
-# Flutter app in Zapp!
+# App con Flutter
+## Descrizione
+Applicazione di chatroom in tempo reale sviluppata con Flutter e Dart, che utilizza una connessione TCP Socket per comunicare con un server locale.
 
-A new Flutter project built with Zapp!
+## Funzionalità
+- Pagina di login per inserire lo username.
+- Chatroom con messaggi in tempo reale e aggiornamento dinamico.
+- Visualizzazione dei messaggi con bolle separate:
+- Messaggi propri a destra (blu)
+- Messaggi degli altri a sinistra (grigio)
+- Notifiche di entrata/uscita utenti nella chatroom.
+- Gestione sicura delle connessioni TCP e chiusura socket al termine(dispose()).
 
-----
+## Struttura del progetto
+- `main.dart` → Contiene il codice dell’app Flutter, login, chatroom e interfaccia grafica.
+- `client.dart` → Server TCP  che gestisce più client contemporaneamente, memorizza username, trasmette messaggi e notifica entrate/uscite.
+- `server.dart` → Client console , permette di connettersi al server, inviare/ricevere messaggi da terminale.
 
-> To learn how to use Zapp! check out the [documentation](https://docs.zapp.run)
+# Dettagli implementativi
 
-----
+## Server (`server.dart`)
+- Ascolta su porta **4200** connessioni in arrivo.
+- Gestisce **più client contemporaneamente** con lista `List<ChatClient> clients = [];`.
+- Broadcast dei messaggi a tutti i client **tranne il mittente**  `excludeClient`
+- Classe `ChatClient` rappresenta ogni client con il proprio socket e username
 
-## Getting Started
+## Client Flutter (`main.dart`)
+### LoginPage
+- Widget **Stateful** con campo testo per inserire lo **username**
 
-This project is a starting point for a Flutter application.
+### ChatPage
+- Widget **Stateful** per la chat:
+  - Connessione **TCP** al server (`Socket.connect`)
+  - Invio e ricezione dei messaggi
+  - Aggiornamento dinamico della lista `messaggi` tramite `setState()`
+  - Gestione della chiusura socket con `dispose()`
 
-A few resources to get you started if this is your first Flutter project:
+### Lista dei messaggi
+- Costruita con `ListView.builder`
+  - `itemCount` → numero di messaggi
+  - `itemBuilder` → genera una bolla per ogni messaggio
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+## Client Console (`client.dart`)
+- Connette al server **TCP** sulla stessa porta
+- Legge input da terminale e lo invia al server
+- Riceve messaggi dal server e li stampa in console
