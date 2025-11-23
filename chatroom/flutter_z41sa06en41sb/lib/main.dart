@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 void main() {
   runApp(MyApp());
 }
 
+// ----------------------------------------------------
+// APP
+// ----------------------------------------------------
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -14,8 +18,15 @@ class MyApp extends StatelessWidget {
 // ----------------------------------------------------
 // LOGIN PAGE
 // ----------------------------------------------------
-class LoginPage extends StatelessWidget {
-  final TextEditingController usernameController = TextEditingController();
+// 
+class LoginPage extends StatefulWidget {
+  @override
+  LoginPageState createState() => LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
+  // variabile username per memorizzare l'username
+  String username = '';
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +42,8 @@ class LoginPage extends StatelessWidget {
             SizedBox(
               width: 250,
               child: TextField(
-                controller: usernameController,
+                // onChanged aggiorna direttamente la variabile username
+                onChanged: (value) => username= value.trim(),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Username",
@@ -43,13 +55,12 @@ class LoginPage extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                String user = usernameController.text.trim();
-                if (user.isEmpty) return;
+                if (username.isEmpty) return;
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatPage(username: user),
+                    builder: (context) => ChatPage(username: username),
                   ),
                 );
               },
@@ -66,7 +77,7 @@ class LoginPage extends StatelessWidget {
 // CHAT PAGE CON TCP
 // ----------------------------------------------------
 class ChatPage extends StatefulWidget {
-   String username;
+  final String username;
 
   ChatPage({required this.username});
 
@@ -75,23 +86,65 @@ class ChatPage extends StatefulWidget {
 }
 
 class ChatPageState extends State<ChatPage> {
-   TextEditingController msgController = TextEditingController();
-  List<String> messaggi = []; // lista dei messsaggi
+  TextEditingController msgController = TextEditingController();
+  List<String> messaggi = []; // lista che contiene i mess
+
+  Socket? socket;
 
   @override
   void initState() {
     super.initState();
+    connectToServer();
   }
 
+  // ----------------------------------------------------
+  // CONNESSIONE TCP
+  // ----------------------------------------------------
+  void connectToServer() async {
+    try {
+      socket = await Socket.connect("localhost", 4200);
+
+      print("CONNESSO AL SERVER");
+
+      //ascolto dei messaggi dal server
+      socket!.listen((data) {
+        String msg = String.fromCharCodes(data).trim();
+
+        setState(() {
+          messaggi.add(msg);
+        });
+      });
+
+      //invio username al server
+      socket!.write("${widget.username}\n");
+
+    } catch (e) {
+      print("ERRORE CONNESSIONE: $e");
+    }
+  }
+
+  // ----------------------------------------------------
+  // INVIO MESSAGGI
+  // ----------------------------------------------------
   void inviaMessaggio() {
     String testo = msgController.text.trim();
-    if (testo.isEmpty) return;
+    if (testo.isEmpty || socket == null) return;
 
+    //invio al server tetso
+    socket!.write("$testo\n");
+
+    // ,ostra subito il messaggio localmente
     setState(() {
       messaggi.add("${widget.username}: $testo");
     });
 
     msgController.clear();
+  }
+
+  @override
+  void dispose() {
+    socket?.close();
+    super.dispose();
   }
 
   // ----------------------------------------------------
@@ -105,17 +158,9 @@ class ChatPageState extends State<ChatPage> {
       body: Column(
         children: [
           Expanded(
-            /*  
- ListView(
-  children: [
-    Text(messaggi[0]),
-    Text(messaggi[1]),
-    Text(messaggi[2]),
-  ],
-) */
             child: ListView.builder(
               padding: EdgeInsets.all(8),
-              itemCount: messaggi.length, // per listview .builder per dire quantit elementi deve costruire
+              itemCount: messaggi.length,
               itemBuilder: (context, index) {
                 return Chat(
                   text: messaggi[index],
@@ -134,10 +179,13 @@ class ChatPageState extends State<ChatPage> {
                     hintText: "Scrivi un messaggio...",
                     contentPadding: EdgeInsets.all(12),
                   ),
+                  onSubmitted: (_) => inviaMessaggio(),
                 ),
               ),
-
-              IconButton(icon: Icon(Icons.send), onPressed: inviaMessaggio),
+              IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: inviaMessaggio
+              ),
             ],
           ),
         ],
@@ -150,8 +198,8 @@ class ChatPageState extends State<ChatPage> {
 // BOLLA MESSAGGIO
 // ----------------------------------------------------
 class Chat extends StatelessWidget {
-  String text;
-  bool isMe;
+  final String text;
+  final bool isMe;
 
   Chat({required this.text, required this.isMe});
 
@@ -161,6 +209,7 @@ class Chat extends StatelessWidget {
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         padding: EdgeInsets.all(12),
+        margin: EdgeInsets.symmetric(vertical: 3),
         decoration: BoxDecoration(
           color: isMe ? Colors.blue[200] : Colors.grey[300],
           borderRadius: BorderRadius.circular(12),
