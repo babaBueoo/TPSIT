@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'colors.dart';
 import 'model.dart';
 import 'notifier.dart';
 import 'widgets.dart';
@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'am043 todo list',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.red)),
       home: ChangeNotifierProvider<TodoListNotifier>(
@@ -62,32 +63,99 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+   @override
+Widget build(BuildContext context) {
+  final TodoListNotifier notifier = context.watch<TodoListNotifier>();
 
-  @override
-  Widget build(BuildContext context) {
-    final TodoListNotifier notifier = context.watch<TodoListNotifier>();
+  return Scaffold(
+    backgroundColor: bgColor,
+    body: SafeArea(
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            width: MediaQuery.of(context).size.width,
+            height: 55,
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(Icons.menu, color: white),
+                      
 
-    return Scaffold(
-      appBar: AppBar(
-        shadowColor: Theme.of(context).shadowColor,
-        elevation: 4,
-        title: Text(widget.title),
+
+                    ),
+                    SizedBox(width: 16),
+                    
+                    Container(
+                      height: 55,
+                      width: 200,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "cerca la tua nota",
+                            style: TextStyle(
+                              color: white.withOpacity(0.5),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: Icon(Icons.grid_view, color: white),
+                      ),
+                      SizedBox(width: 9),
+                      CircleAvatar(
+                        backgroundColor: white,
+                        radius: 18,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ====== LISTA TODO ======
+          Expanded(
+            child: ListView.builder(
+              itemCount: notifier.length,
+              itemBuilder: (context, index) {
+                return TodoItem(todo: notifier.getTodo(index));
+              },
+            ),
+          ),
+        ],
       ),
-      body: Center(
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          itemCount: notifier.length,
-          itemBuilder: (context, index) {
-            Todo todo = notifier.getTodo(index);
-            return TodoItem(todo: todo);
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _displayDialog(notifier),
-        tooltip: 'add todo',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () => _displayDialog(notifier),
+      child: const Icon(Icons.add),
+    ),
+  );
 }
+  }
