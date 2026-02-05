@@ -4,6 +4,8 @@ import 'colors.dart';
 import 'model.dart';
 import 'notifier.dart';
 
+/// Widget che rappresenta una singola card Todo con le sue note
+/// Gestisce la modifica inline delle note e l'aggiunta di nuove note
 class TodoItem extends StatefulWidget {
   TodoItem({required this.todo}) : super(key: ObjectKey(todo));
 
@@ -14,12 +16,19 @@ class TodoItem extends StatefulWidget {
 }
 
 class _TodoItemState extends State<TodoItem> {
+  // Map per gestire un controller separato per ogni nota
+  // Chiave: oggetto TodoNote, Valore: TextEditingController per quella nota
   Map<TodoNote, TextEditingController> controllers = {};
+  
+  // Map per gestire il focus separato di ogni nota
   Map<TodoNote, FocusNode> focusNodes = {};
+  
+  // Tiene traccia di quale nota è attualmente in modifica
   TodoNote? editingNote;
 
   @override
   void dispose() {
+    // IMPORTANTE: Pulisce tutti i controller e focus node per evitare memory leak
     for (var controller in controllers.values) {
       controller.dispose();
     }
@@ -29,6 +38,8 @@ class _TodoItemState extends State<TodoItem> {
     super.dispose();
   }
 
+  /// Ottiene o crea il controller per una specifica nota
+  /// Pattern lazy initialization: crea solo quando necessario
   TextEditingController _getController(TodoNote note) {
     if (!controllers.containsKey(note)) {
       controllers[note] = TextEditingController(text: note.text);
@@ -36,6 +47,7 @@ class _TodoItemState extends State<TodoItem> {
     return controllers[note]!;
   }
 
+  /// Ottiene o crea il focus node per una specifica nota
   FocusNode _getFocusNode(TodoNote note) {
     if (!focusNodes.containsKey(note)) {
       focusNodes[note] = FocusNode();
@@ -43,37 +55,46 @@ class _TodoItemState extends State<TodoItem> {
     return focusNodes[note]!;
   }
 
+  /// Attiva la modalità di modifica per una nota
+  /// [note] la nota da modificare
   void _startEditing(TodoNote note) {
     setState(() {
       editingNote = note;
       _getController(note).text = note.text;
     });
+    // Sposta il focus sul TextField DOPO che il widget è stato ricostruito
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _getFocusNode(note).requestFocus();
     });
   }
 
+  /// Termina la modifica e salva il testo nel database
+  /// [notifier] per chiamare updateNoteText
+  /// [note] la nota da salvare
   void _finishEditingAndSave(TodoListNotifier notifier, TodoNote note) {
     final controller = _getController(note);
-    // Salva sempre il testo, anche se vuoto
+    // Salva sempre il testo, anche se vuoto (l'utente può voler note vuote)
     notifier.updateNoteText(note, controller.text);
     setState(() {
       if (editingNote == note) {
-        editingNote = null;
+        editingNote = null; // Esce dalla modalità editing
       }
     });
   }
 
-  void _addNewNote(TodoListNotifier notifier) {
-    // Se c'è una nota in editing, salva il testo corrente
+  /// Aggiunge una nuova nota vuota alla card e la apre in modifica
+  /// [notifier] per chiamare addNoteToTodo
+  Future<void> _addNewNote(TodoListNotifier notifier) async {
+    // Se c'è una nota in editing, salva prima il suo contenuto
     if (editingNote != null) {
       final controller = _getController(editingNote!);
-      notifier.updateNoteText(editingNote!, controller.text);
+      await notifier.updateNoteText(editingNote!, controller.text);
     }
     
-    // Crea una nuova nota vuota
-    final newNote = notifier.addNoteToTodo(widget.todo, '');
-    // Inizia subito a modificarla
+    // Crea una nuova nota vuota nel database
+    final newNote = await notifier.addNoteToTodo(widget.todo, '');
+    
+    // Apre immediatamente la nuova nota in modalità editing
     setState(() {
       _startEditing(newNote);
     });
@@ -81,6 +102,7 @@ class _TodoItemState extends State<TodoItem> {
 
   @override
   Widget build(BuildContext context) {
+    // Ascolta i cambiamenti del notifier per aggiornare l'UI
     final TodoListNotifier notifier = context.watch<TodoListNotifier>();
 
     return Container(
@@ -98,6 +120,7 @@ class _TodoItemState extends State<TodoItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // ========== HEADER: Titolo e bottone elimina card ==========
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -122,7 +145,11 @@ class _TodoItemState extends State<TodoItem> {
               ),
             ],
           ),
+          
+          // Spaziatura tra titolo e note
           if (widget.todo.notes.isNotEmpty) const SizedBox(height: 8),
+          
+          // ========== LISTA NOTE: Checkbox + Testo/TextField + Elimina ==========
           ...widget.todo.notes.map((note) {
             final isEditing = editingNote == note;
             final controller = _getController(note);
@@ -133,6 +160,7 @@ class _TodoItemState extends State<TodoItem> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Checkbox per segnare la nota come completata
                   Checkbox(
                     value: note.checked,
                     onChanged: (bool? value) {
@@ -145,6 +173,8 @@ class _TodoItemState extends State<TodoItem> {
                       return white.withOpacity(0.3);
                     }),
                   ),
+                  
+                  // Area del testo: TextField in editing, Text altrimenti
                   Expanded(
                     child: isEditing
                         ? TextField(
@@ -158,10 +188,13 @@ class _TodoItemState extends State<TodoItem> {
                               hintText: 'Scrivi qui...',
                               hintStyle: TextStyle(color: white.withOpacity(0.5)),
                             ),
+                            // Salva quando si preme Invio
                             onSubmitted: (_) => _finishEditingAndSave(notifier, note),
+                            // Salva quando si clicca fuori dal campo
                             onTapOutside: (_) => _finishEditingAndSave(notifier, note),
                           )
                         : GestureDetector(
+                            // Tap sul testo per iniziare la modifica
                             onTap: () => _startEditing(note),
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12),
@@ -171,6 +204,7 @@ class _TodoItemState extends State<TodoItem> {
                                   color: note.text.isEmpty ? white.withOpacity(0.5) : white,
                                   fontSize: 14,
                                   fontStyle: note.text.isEmpty ? FontStyle.italic : FontStyle.normal,
+                                  // Strikethrough se la nota è completata
                                   decoration: note.checked ? TextDecoration.lineThrough : null,
                                   decorationColor: white.withOpacity(0.6),
                                   decorationThickness: 2,
@@ -179,6 +213,8 @@ class _TodoItemState extends State<TodoItem> {
                             ),
                           ),
                   ),
+                  
+                  // Bottone per eliminare la singola nota
                   IconButton(
                     icon: Icon(Icons.delete_outline, color: white.withOpacity(0.5)),
                     iconSize: 18,
@@ -186,6 +222,7 @@ class _TodoItemState extends State<TodoItem> {
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       notifier.deleteNoteFromTodo(widget.todo, note);
+                      // Pulisce anche controller e focus node dalla memoria
                       controllers.remove(note);
                       focusNodes.remove(note);
                     },
@@ -194,7 +231,10 @@ class _TodoItemState extends State<TodoItem> {
               ),
             );
           }).toList(),
+          
           const SizedBox(height: 8),
+          
+          // ========== FOOTER: Bottone "+ nuova nota" ==========
           InkWell(
             onTap: () => _addNewNote(notifier),
             child: Padding(
