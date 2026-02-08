@@ -179,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
             // ========== HEADER: Barra di ricerca (non funzionale) ==========
             Container(
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              width: MediaQuery.of(context).size.width,
               height: 55,
               decoration: BoxDecoration(
                 color: cardColor,
@@ -193,51 +192,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: null, // Menu disabilitato
-                        disabledColor: white,
-                        icon: const Icon(Icons.menu),
-                      ),
-                      const SizedBox(width: 16),
-                      Container(
-                        height: 55,
-                        width: 200,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "cerca la tua nota",
-                              style: TextStyle(
-                                color: white.withOpacity(0.5),
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    onPressed: null, // Menu disabilitato
+                    disabledColor: white,
+                    icon: const Icon(Icons.menu),
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {}, // Grid view (già attivo)
-                          child: const Icon(Icons.grid_view, color: white),
-                        ),
-                        const SizedBox(width: 9),
-                        const CircleAvatar(
-                          backgroundColor: white,
-                          radius: 18,
-                        ),
-                      ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "cerca la tua nota",
+                      style: TextStyle(
+                        color: white.withOpacity(0.5),
+                        fontSize: 16,
+                      ),
                     ),
                   ),
+                  IconButton(
+                    onPressed: () {}, // Grid view (già attivo)
+                    icon: const Icon(Icons.grid_view, color: white),
+                  ),
+                  const SizedBox(width: 4),
+                  const CircleAvatar(
+                    backgroundColor: white,
+                    radius: 16,
+                  ),
+                  const SizedBox(width: 10),
                 ],
               ),
             ),
@@ -255,13 +235,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // ========== FAB: Bottone per aggiungere nuova card ==========
       floatingActionButton: FloatingActionButton(
         onPressed: () => _displayDialog(notifier),
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.red,
+        child: const Icon(Icons.add, color: white),
       ),
     );
   }
 }
 
-/// Widget che implementa il layout Masonry Grid (stile Pinterest/Google Keep)
+/// Widget che implementa il layout Masonry Grid 
 /// Distribuisce le card su 2 colonne con altezze variabili
 class MasonryGridView extends StatelessWidget {
   final TodoListNotifier todos;
