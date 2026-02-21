@@ -102,12 +102,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                             ),
-                            // Mostra il bottone rimuovi solo se ci sono almeno 2 note
+                            // Mostra il bottone rimuovi solo se ci sono almeno 2 note questa parte non è funzionante
                             if (noteControllers.length > 1)
                               IconButton(
                                 icon: Icon(Icons.remove_circle_outline, color: Colors.red),
                                 onPressed: () {
                                   setState(() {
+                                    //controllare online
                                     noteControllers.removeAt(index);
                                   });
                                 },
