@@ -81,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     
                     // ========== CAMPI NOTE (dinamici) ==========
                     // Genera un TextField per ogni controller nella lista
+                    // la proprietà children accetta List<Widget> ma non accetta una lista dentro un alytra lista, quindi tocca crearne una nuova
                     ...List.generate(noteControllers.length, (index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -102,17 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                             ),
-                            // Mostra il bottone rimuovi solo se ci sono almeno 2 note questa parte non è funzionante
-                            if (noteControllers.length > 1)
-                              IconButton(
-                                icon: Icon(Icons.remove_circle_outline, color: Colors.red),
-                                onPressed: () {
-                                  setState(() {
-                                    //controllare online
-                                    noteControllers.removeAt(index);
-                                  });
-                                },
-                              ),
                           ],
                         ),
                       );
@@ -149,6 +139,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                     
                     // Raccoglie solo le note non vuote
+                    // noteControllers è una List<TextEditingController>
+
+                    // map trasforma ogni elemento della lista
                     final noteTexts = noteControllers
                         .map((c) => c.text.trim())
                         .where((text) => text.isNotEmpty)
