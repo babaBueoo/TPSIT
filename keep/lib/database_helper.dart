@@ -19,7 +19,7 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB('todos.db');
-    return _database!;
+    return _database!; // valore sicuramente non null
   }
 
   /// Inizializza il database creando il file e le tabelle
