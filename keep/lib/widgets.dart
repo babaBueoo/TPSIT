@@ -29,7 +29,7 @@ class _TodoItemState extends State<TodoItem> {
   @override
   void dispose() {
     // IMPORTANTE: Pulisce tutti i controller e focus node per evitare memory leak
-    for (var controller in controllers.values) {
+    for (var controller in controllers.values) { // comodità sintattica
       controller.dispose();
     }
     for (var focusNode in focusNodes.values) {
@@ -41,7 +41,7 @@ class _TodoItemState extends State<TodoItem> {
   /// Ottiene o crea il controller per una specifica nota
   /// Pattern lazy initialization: crea solo quando necessario
   TextEditingController _getController(TodoNote note) {
-    if (!controllers.containsKey(note)) {
+    if (!controllers.containsKey(note)) { // controllo se esiste un controller per quella notaù
       controllers[note] = TextEditingController(text: note.text);
     }
     return controllers[note]!;
