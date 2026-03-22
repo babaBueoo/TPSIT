@@ -63,7 +63,7 @@ class _TodoItemState extends State<TodoItem> {
       _getController(note).text = note.text;
     });
     // Sposta il focus sul TextField DOPO che il widget è stato ricostruito
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) { // parametro diu tipo duration ma a  me serve solo sapere se è avvenuto
       _getFocusNode(note).requestFocus();
     });
   }
@@ -189,7 +189,7 @@ class _TodoItemState extends State<TodoItem> {
                               hintStyle: TextStyle(color: white.withOpacity(0.5)),
                             ),
                             // Salva quando si preme Invio
-                            onSubmitted: (_) => _finishEditingAndSave(notifier, note),
+                            onSubmitted: (_) => _finishEditingAndSave(notifier, note), // (_) ignoro   come parametro perche uso il controller per leggerlo su void _finishEditingAndSave
                             // Salva quando si clicca fuori dal campo
                             onTapOutside: (_) => _finishEditingAndSave(notifier, note),
                           )
