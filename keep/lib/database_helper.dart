@@ -79,7 +79,7 @@ class DatabaseHelper {
     final db = await database;
     
     // Ottiene tutte le card dalla tabella todos
-    final todosMap = await db.query('todos');
+    final todosMap = await db.query('todos'); // List<Map<String,dynamic>>
     
     List<Todo> todos = [];
     
