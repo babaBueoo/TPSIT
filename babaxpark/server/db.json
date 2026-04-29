@@ -1,0 +1,26 @@
+{
+  "utenti": [
+    {
+      "id": "1",
+      "nome": "Admin",
+      "email": "admin@test.com",
+      "password": "$2a$10$JpVzcDxO9LX3BQQtw8PvuuEvn19lMOkRXZSr3GbEbKF7sdZncd0Oq",
+      "targa": "ADMIN01"
+    }
+  ],
+  "veicoli": [
+    {
+      "targa": "AB123CD"
+    }
+  ],
+  "prenotazioni": [
+    {
+      "id": "1",
+      "targa": "AB123CD",
+      "id_posto": 1,
+      "data_inizio": "2026-04-22T08:00:00Z",
+      "data_fine": "2026-04-22T10:00:00Z",
+      "stato": "attiva"
+    }
+  ]
+}
