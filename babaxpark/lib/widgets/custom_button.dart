@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor = const Color(0xFF1A7A4A), // Default green
+    this.backgroundColor = const Color(0xFF1A7A4A), 
   });
 
   @override
