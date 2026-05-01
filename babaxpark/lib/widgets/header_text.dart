@@ -9,7 +9,7 @@ class HeaderText extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    this.titleColor = const Color(0xFFFF6B00), // Default orange
+    this.titleColor = const Color(0xFFFF6B00), 
   });
 
   @override
