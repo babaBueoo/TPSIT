@@ -382,26 +382,27 @@ class PrenotazioneCardState extends State<PrenotazioneCard> {
     return "${oreFine.toString().padLeft(2, '0')}:${minutiFine.toString().padLeft(2, '0')}";
   }
 
-  // Controlla se un'ora è già occupata da una prenotazione esistente
+  // controllo prenotazione già esistente
   bool oraOccupata(String ora) {
     final d = widget.selectedDate;
-    final dataStr =
-        "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-
     final partiOra = ora.split(':');
-    int oraMinuti = int.parse(partiOra[0]) * 60 + int.parse(partiOra[1]);
+    final oraDt = DateTime(d.year, d.month, d.day, int.parse(partiOra[0]), int.parse(partiOra[1]));
+    
+    final partiDurata = selectedDurata.split(':');
+    final fineDt = oraDt.add(Duration(
+      hours: int.parse(partiDurata[0]),
+      minutes: int.parse(partiDurata[1]),
+    ));
 
     for (final p in widget.prenotazioniPosto) {
-      if (!p.dataInizio.startsWith(dataStr)) continue;
-      if (p.dataInizio.length < 16 || p.dataFine.length < 16) continue;
-
-      final partiInizio = p.dataInizio.substring(11, 16).split(':');
-      final partiFine = p.dataFine.substring(11, 16).split(':');
-      int inizioMinuti =
-          int.parse(partiInizio[0]) * 60 + int.parse(partiInizio[1]);
-      int fineMinuti = int.parse(partiFine[0]) * 60 + int.parse(partiFine[1]);
-
-      if (oraMinuti >= inizioMinuti && oraMinuti < fineMinuti) return true;
+      if (p.stato != "attiva") continue;
+        final pInizio = DateTime.parse(p.dataInizio);
+        final pFine = DateTime.parse(p.dataFine);
+        
+        // controllo dta inzio e fine 
+        if (oraDt.isBefore(pFine) && fineDt.isAfter(pInizio)) {
+          return true;
+        } 
     }
     return false;
   }
@@ -443,21 +444,34 @@ class PrenotazioneCardState extends State<PrenotazioneCard> {
       return;
     }
 
-    // Controllo univocità targa: la targa non può avere due prenotazioni sovrapposte
     final inizioIso = costruisciDataIso(widget.selectedDate, selectedOra);
-    final fineIso = costruisciDataIso(widget.selectedDate, calcolaOraFine(selectedOra, selectedDurata));
-    
-    bool targaGiaPrenotata = widget.allPrenotazioni.any((p) {
+    final inizioDt = DateTime.parse(inizioIso);
+    final partiDurata = selectedDurata.split(':');
+    final fineDt = inizioDt.add(Duration(
+      hours: int.parse(partiDurata[0]),
+      minutes: int.parse(partiDurata[1]),
+    ));
+    final fineIso = fineDt.toIso8601String();
+
+    // controllo univocità targa
+    bool targaGiaPrenotataOggi = widget.allPrenotazioni.any((p) {
       if (p.targa.toUpperCase() != targaInserita) return false;
       if (p.stato != "attiva") return false;
-      // Sovrapposizione temporale
-      return (inizioIso.compareTo(p.dataFine) < 0 && fineIso.compareTo(p.dataInizio) > 0);
+      
+      try {
+        final pInizioDt = DateTime.parse(p.dataInizio);
+        return pInizioDt.year == widget.selectedDate.year &&
+               pInizioDt.month == widget.selectedDate.month &&
+               pInizioDt.day == widget.selectedDate.day;
+      } catch (e) {
+        return false;
+      }
     });
 
-    if (targaGiaPrenotata) {
+    if (targaGiaPrenotataOggi) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Questa targa ha già una prenotazione attiva in questo orario!'),
+          content: Text('Questa targa ha già una prenotazione per questa data!'),
           backgroundColor: PrenotazioniPage.orange,
         ),
       );
