@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'widgets/parking_map.dart';
 import 'repositories/parking_repository.dart';
 import 'models/prenotazione.dart';
 import 'services/sessione_utente.dart';
@@ -19,6 +20,7 @@ class PrenotazioniPageState extends State<PrenotazioniPage> {
   List<Prenotazione> prenotazioni = [];
   bool caricando = false;
   bool serverOffline = false;
+  bool isMappaExpanded = false;
   DateTime selectedDate = DateTime.now();
 
   @override
@@ -223,6 +225,81 @@ class PrenotazioniPageState extends State<PrenotazioniPage> {
                         },
                       ),
               ),
+
+              // Mappa del parcheggio
+              SizedBox(height: 24),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    isMappaExpanded = !isMappaExpanded;
+                  });
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: PrenotazioniPage.orange.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: PrenotazioniPage.orange.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.local_parking,
+                          color: PrenotazioniPage.orange,
+                          size: 22,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          "Mappa Parcheggio",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        isMappaExpanded
+                            ? Icons.keyboard_arrow_down
+                            : Icons.arrow_forward_ios,
+                        color: PrenotazioniPage.orange,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (isMappaExpanded)
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(top: 12),
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: PrenotazioniPage.orange.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: ParkingMapPainter(),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
