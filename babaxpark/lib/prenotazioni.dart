@@ -151,31 +151,18 @@ class PrenotazioniPageState extends State<PrenotazioniPage> {
                     ),
                   ),
 
-                  // Tasto aggiorna
-                  caricando
-                      ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: PrenotazioniPage.orange,
-                          ),
-                        )
-                      : IconButton(
-                          onPressed: caricaPrenotazioni,
-                          icon: Icon(
-                            Icons.refresh,
-                            color: PrenotazioniPage.orange,
-                          ),
-                          tooltip: 'Aggiorna',
-                        ),
+
                 ],
               ),
               SizedBox(height: 24),
 
               // Lista card
               Expanded(
-                child: serverOffline
+                child: RefreshIndicator(
+                  onRefresh: caricaPrenotazioni,
+                  color: PrenotazioniPage.orange,
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  child: serverOffline
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -205,6 +192,7 @@ class PrenotazioniPageState extends State<PrenotazioniPage> {
                         ),
                       )
                     : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: 14, // n parcheggi
                         itemBuilder: (context, index) {
                           final postoIndex = index + 1;
@@ -224,6 +212,7 @@ class PrenotazioniPageState extends State<PrenotazioniPage> {
                           );
                         },
                       ),
+                ),
               ),
 
               // Mappa del parcheggio
@@ -345,7 +334,7 @@ class PrenotazioneCardState extends State<PrenotazioneCard> {
   @override
   void initState() {
     super.initState();
-    targaController = TextEditingController(text: SessioneUtente().targa ?? "");
+    targaController = TextEditingController(text: "");
   }
 
   @override
@@ -452,7 +441,7 @@ class PrenotazioneCardState extends State<PrenotazioneCard> {
     int minutiDurata =
         int.parse(partiDurata[0]) * 60 + int.parse(partiDurata[1]);
 
-    int minutiFineTotali = minutiInizio + minutiDurata;
+    final int minutiFineTotali = minutiInizio + minutiDurata;
     int oreFine = (minutiFineTotali ~/ 60) % 24;
     int minutiFine = minutiFineTotali % 60;
 

@@ -1,10 +1,10 @@
 class Prenotazione {
-  final String id;
-  final String targa;
-  final int idPosto;
-  final String dataInizio;
-  final String dataFine;
-  final String stato;
+  String id;
+  String targa;
+  int idPosto;
+  String dataInizio;
+  String dataFine;
+  String stato;
 
   Prenotazione({
     required this.id,

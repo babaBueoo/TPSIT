@@ -68,28 +68,14 @@ class SettingsPageState extends State<SettingsPage> {
             fontSize: 24,
           ),
         ),
-        actions: [
-          caricamento
-              ? Padding(
-                  padding: EdgeInsets.all(14),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: SettingsPage.orange,
-                    ),
-                  ),
-                )
-              : IconButton(
-                  onPressed: caricaPrenotazioni,
-                  icon: Icon(Icons.refresh, color: SettingsPage.orange),
-                  tooltip: 'Aggiorna',
-                ),
-        ],
+        actions: const [],
       ),
-      body: SafeArea(
+      body: RefreshIndicator(
+        onRefresh: caricaPrenotazioni,
+        color: SettingsPage.orange,
+        backgroundColor: const Color(0xFF1A1A1A),
         child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
@@ -303,14 +289,44 @@ class SettingsPageState extends State<SettingsPage> {
                             color: SettingsPage.green.withValues(alpha: 0.4),
                           ),
                         ),
-                        child: Text(
-                          "1. No sta far el volpe, se te rivi qua e no te ghe a prenotazion te ve fora dae bae\n\n"
-                          "2. Confidemo nea bona fede, ogni tanto buta un ocio sull'orario di uscita dal parchejo\n\n"
-                          "3. No vojo vedar rivar macchine dea mutua (elettriche), in tal caso, no sta sorpendarte de trovar strissi o speci/speceti spacai\n\n"
-                          "4. Ocio a parchejar a modo o ti ga i morti cani\n\n"
-                          "5. Se te vedi gaine porsei o altre bestie nel parchejo avisame che i se scampai daea boarìa\n\n"
-                          "6. Sia dal cavalo, sia dal musso, sta tre passi lontan dal cueo",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "1. No sta far el volpe, se te rivi qua e no te ghe a prenotazion te ve fora dae bae\n\n"
+                              "2. Confidemo nea bona fede, ogni tanto buta un ocio sull'orario di uscita dal parchejo\n\n"
+                              "3. No vojo vedar rivar macchine dea mutua (elettriche), in tal caso, no sta sorpendarte de trovar strissi o speci/speceti spacai\n\n"
+                              "4. Ocio a parchejar a modo o ti ga i morti cani\n\n"
+                              "5. Se te vedi gaine porsei o altre bestie nel parchejo avisame che i se scampai daea boarìa\n\n"
+                              "6. Sia dal cavalo, sia dal musso, sta tre passi lontan dal cueo\n\n"
+                              "7. Ocio al paron! narra leggenda che qualunque volta che questo regolamento non venga rispettato possa apparire EL PARON! Le un fio molto par e sue ma se ghe gira mae se mejo scampar via. A seguito te aso dee ricostrusion affidabii: ",
+                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.asset(
+                                      "assets/icon/icona.png",
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.asset(
+                                      "assets/images/zambelli.png",
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
 

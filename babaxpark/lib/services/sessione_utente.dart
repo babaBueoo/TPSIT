@@ -5,19 +5,16 @@ class SessioneUtente {
 
   String? nome;
   String? email;
-  String? targa;
 
   bool get isLoggato => email != null;
 
-  void login(String nomeLog, String emailLog, String targaLog) {
+  void login(String nomeLog, String emailLog) {
     nome = nomeLog;
     email = emailLog;
-    targa = targaLog;
   }
 
   void logout() {
     nome = null;
     email = null;
-    targa = null;
   }
 }

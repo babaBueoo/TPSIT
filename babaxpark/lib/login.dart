@@ -46,8 +46,7 @@ class LoginPageState extends State<LoginPage> {
         // Salviamo i dati reali trovati nel database
         SessioneUtente().login(
           utente['nome'] ?? utente['username'] ?? "Utente", 
-          utente['email'], 
-          utente['targa'] ?? "AB123CD"
+          utente['email']
         );
 
         Navigator.pushReplacement(
