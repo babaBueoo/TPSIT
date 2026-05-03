@@ -12,18 +12,14 @@ class ParkingRepository {
   Future<List<Veicolo>> getVeicoli() async {
     try {
       List<Veicolo> veicoli = await apiService.getVeicoli();
-      // sincfonizza chace locale
-      await dbHelper.clearVeicoli();
-      for (Veicolo v in veicoli) {
-      final veicoli = await apiService.getVeicoli();
-      // sincfonizza chace locale
+      // Sincronizza cache locale
       await dbHelper.clearVeicoli();
       for (Veicolo v in veicoli) {
         await dbHelper.insertVeicolo(v);
       }
-      return veicoli;
+      return await dbHelper.getAllVeicoli();
     } catch (e) {
-     //offline o errore server
+      // Offline o errore server
       return await dbHelper.getAllVeicoli();
     }
   }
@@ -42,18 +38,14 @@ class ParkingRepository {
   Future<List<Prenotazione>> getPrenotazioni() async {
     try {
       List<Prenotazione> prenotazioni = await apiService.getPrenotazioni();
-      // wincronizza cache locale
-      await dbHelper.clearPrenotazioni();
-      for (Prenotazione p in prenotazioni) {
-      final prenotazioni = await apiService.getPrenotazioni();
-      // wincronizza cache locale
+      // Sincronizza cache locale
       await dbHelper.clearPrenotazioni();
       for (Prenotazione p in prenotazioni) {
         await dbHelper.insertPrenotazione(p);
       }
       return await dbHelper.getPrenotazioni();
     } catch (e) {
-      // offline o errore server
+      // Offline o errore server
       return await dbHelper.getPrenotazioni();
     }
   }
