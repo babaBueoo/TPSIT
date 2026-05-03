@@ -31,7 +31,6 @@ class ParkingRepository {
   Future<Veicolo> createVeicolo(Veicolo veicolo) async {
     try {
       Veicolo createdVeicolo = await apiService.createVeicolo(veicolo);
-      final createdVeicolo = await apiService.createVeicolo(veicolo);
       await dbHelper.insertVeicolo(createdVeicolo);
       return createdVeicolo;
     } on SocketException {
@@ -62,7 +61,6 @@ class ParkingRepository {
   Future<Prenotazione> createPrenotazione(Prenotazione prenotazione) async {
     try {
       Prenotazione createdPrenotazione = await apiService.createPrenotazione(prenotazione);
-      final createdPrenotazione = await apiService.createPrenotazione(prenotazione);
       await dbHelper.insertPrenotazione(createdPrenotazione);
       return createdPrenotazione;
     } on SocketException {
